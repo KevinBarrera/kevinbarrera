@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+	Hola, esto es desde HTML
+
+	<h1>Esto es con Mysqul</h1>
+
+	<form id="mysql_insert">
+		<input type="text" name="mysql_nombre" placeholder="Nombre">
+		<input type="text" name="mysql_dinero" placeholder="Dinero">
+		<button type="submit">Insertar</button>
+	</form>
+
+	<form action="" id="mysql_rud">
+		<select id="mysql_nombres">
+			
+		</select>
+		<input type="text" name="money" placeholder="Dinero">
+		<button id="mysql_update">Update</button>
+		<button id="mysql_delete">Delete</button>
+	</form>
+
+	<h1>Esto es con PostGres</h1>
+
+	<form id="pg_insert">
+		<input type="text" name="pg_nombre" placeholder="Nombre">
+		<input type="text" name="pg_dinero" placeholder="Dinero">
+		<button type="submit">Insertar</button>
+	</form>
+
+	<form action="" id="pg_rud">
+		<select id="pg_nombres">
+			
+		</select>
+		<input type="text" name="money" placeholder="Dinero">
+		<button id="pg_update">Update</button>
+		<button id="pg_delete">Delete</button>
+	</form>
+
+
+
+	<div id="result"></div>
+
+</body>
+
+<script>
+	$(document).ready(function(){
+		actualizaPG();
+		//pg_getmoney();
+	});
+
+	var pgForm = $("#pg_insert");//document.getElementById('mysql_insert'); codigo equivalente
+
+		pgForm.on("submit", function (e) {
+		e.preventDefault();
+
+		var json = pgForm.serializeArray();//Convirtiendo los contenidos en arreglo
+
+		var jsonData = JSON.stringify(json);//Pasando el arreglo a tipo JSON y guardándolo en jasonData
+
+		//console.log(jsonData);
+		$.ajax({
+			url: "pg_insert.php",
+			type: "POST",
+			dataType: "JSON",
+			data: jsonData,
+			success: function(data){
+				$("#result").html(data.msg);
+				actualizaPG();
+			}
+		})
+	});
+
+	function actualizaPG(){
+		$.ajax({
+			url: "pg_select.php",
+			type: "POST",
+			dataType: "JSON",
+			success: function(data){
+				var pg_select = $("#pg_nombres");
+				pg_select.empty();
+				data.forEach(function(element){
+					pg_select.append("<option value='"+element.id+"'>"+ element.nombre +"</option>")
+				});
+				//mysql_getmoney();
+			}
+		})
+	};
+
+	function pg_getmoney(){
+		var id = $('#pg_nombres').val();
+
+		var json = {
+			id: id
+		}
+
+		var jsonData = JSON.stringify(json);
+
+		$.ajax({
+			url: 'pg_getmoney.php',
+			type: 'POST',
+			dataType: 'JSON',
+			data: jsonData,
+			success: function (data){
+				$('#pg_rud>input:first').val(data.dinero);
+			},
+		});
+	};
+
+	/*var mysqlrudForm = $('#mysql_rud');
+
+	mysqlrudForm.on('submit', function (e){
+		e.preventDefault();
+	});
+
+	$('#mysql_nombres').on('change', function (){
+		mysql_getmoney();
+	});*/
+
+
+
+	/*$('#mysql_update').on('click', function (){
+		var id = $('#mysql_nombres').val();
+		var money = $('#mysql_rud>input:first').val();
+		var json = {
+			id: id,
+			dinero: money
+		}
+
+		var jsonData = JSON.stringify(json);
+		mysql_update(jsonData);
+	});*/
+
+	/*$('#mysql_delete').on('click', function (){
+		var id = $('#mysql_nombres').val();
+
+		var json = {
+			id: id
+		}
+
+		var jsonData = JSON.stringify(json);
+		mysql_delete(jsonData);
+	});*/
+
+	/*function pg_update(jsonData){
+		console.log(jsonData);
+		$.ajax({
+			url: 'pg_update.php',
+			type: 'POST',
+			dataType: 'JSON',
+			data: jsonData,
+			success: function (data){
+				$('#result').html(data.msg);
+			},
+		});
+	};
+
+	/*function pg_delete(jsonData){
+		$.ajax({
+			url: 'pg_delete.php',
+			type: 'POST',
+			dataType: 'JSON',
+			data: jsonData,
+			success: function (data){
+				$('#result').html(data.msg);
+				actualizaMysql();
+			},
+		});
+	};*/
+
+
+	
+
+</script>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		actualizaMysql();
+		mysql_getmoney();
+	});
+
+	var myForm = $("#mysql_insert");//document.getElementById('mysql_insert'); codigo equivalente
+
+	myForm.on("submit", function (e) {
+		e.preventDefault();
+
+		var json = myForm.serializeArray();//Convirtiendo los contenidos en arreglo
+
+		var jsonData = JSON.stringify(json);//Pasando el arreglo a tipo JSON y guardándolo en jasonData
+
+		//console.log(jsonData);
+		$.ajax({
+			url: "mysql_insert.php",
+			type: "POST",
+			dataType: "JSON",
+			data: jsonData,
+			success: function(data){
+				$("#result").html(data.msg);
+				actualizaMysql();
+			}
+		})
+	});
+
+	var mysqlrudForm = $('#mysql_rud');
+
+	mysqlrudForm.on('submit', function (e){
+		e.preventDefault();
+	});
+
+	$('#mysql_nombres').on('change', function (){
+		mysql_getmoney();
+	});
+
+
+
+	$('#mysql_update').on('click', function (){
+		var id = $('#mysql_nombres').val();
+		var money = $('#mysql_rud>input:first').val();
+		var json = {
+			id: id,
+			dinero: money
+		}
+
+		var jsonData = JSON.stringify(json);
+		mysql_update(jsonData);
+	});
+
+	$('#mysql_delete').on('click', function (){
+		var id = $('#mysql_nombres').val();
+
+		var json = {
+			id: id
+		}
+
+		var jsonData = JSON.stringify(json);
+		mysql_delete(jsonData);
+	});
+
+
+
+	function actualizaMysql(){
+		$.ajax({
+			url: "mysql_select.php",
+			type: "POST",
+			dataType: "JSON",
+			success: function(data){
+				var mysql_select = $("#mysql_nombres");
+				mysql_select.empty();
+				data.forEach(function(element){
+					mysql_select.append("<option value='"+element.id+"'>"+ element.nombre +"</option>")
+					element.id;
+					element.nombre;
+				});
+				mysql_getmoney();
+			}
+		})
+	};
+
+	function mysql_getmoney(){
+		var id = $('#mysql_nombres').val();
+
+		var json = {
+			id: id
+		}
+
+		var jsonData = JSON.stringify(json);
+
+		$.ajax({
+			url: 'mysql_getmoney.php',
+			type: 'POST',
+			dataType: 'JSON',
+			data: jsonData,
+			success: function (data){
+				$('#mysql_rud>input:first').val(data.dinero);
+			},
+		});
+	};
+
+	function mysql_update(jsonData){
+		console.log(jsonData);
+		$.ajax({
+			url: 'mysql_update.php',
+			type: 'POST',
+			dataType: 'JSON',
+			data: jsonData,
+			success: function (data){
+				$('#result').html(data.msg);
+			},
+		});
+	};
+
+	function mysql_delete(jsonData){
+		$.ajax({
+			url: 'mysql_delete.php',
+			type: 'POST',
+			dataType: 'JSON',
+			data: jsonData,
+			success: function (data){
+				$('#result').html(data.msg);
+				actualizaMysql();
+			},
+		});
+	};
+
+</script>
+</html>
